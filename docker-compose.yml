@@ -1,0 +1,17 @@
+services:
+  rescuez:
+    build: .
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      PORT: 3000
+      HOST: 0.0.0.0
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env}
+      ADMIN_PATH: ${ADMIN_PATH:-/owner-command-center}
+      ADMIN_ALLOWED_IP: ${ADMIN_ALLOWED_IP:-}
+      SESSION_TTL_MS: ${SESSION_TTL_MS:-28800000}
+      DATA_FILE: /app/data/data.json
+    volumes:
+      - ./data:/app/data
+      - ./backups:/app/backups
+    restart: unless-stopped

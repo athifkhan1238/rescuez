@@ -1,0 +1,30 @@
+const $=x=>document.getElementById(x);let id,seen=new Set(),responderPos=null;
+async function api(u,o={}){const token=sessionStorage.getItem('rescuez_responder_token');o.headers={...(o.headers||{}),...(token?{'Authorization':'Bearer '+token}:{})};const r=await fetch(u,o);const t=await r.text();let d;try{d=JSON.parse(t)}catch{throw Error(`Server error (${r.status}): ${t.slice(0,80)}`)}if(!r.ok)throw Error(d.error||'Request failed');return d}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function getGPS(){if(!navigator.geolocation)return;navigator.geolocation.getCurrentPosition(async p=>{responderPos={lat:p.coords.latitude,lng:p.coords.longitude};if(id)try{await api('/api/responders/location',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({responderId:id,lat:responderPos.lat,lng:responderPos.lng})})}catch(e){}},()=>{},{enableHighAccuracy:true,timeout:10000,maximumAge:5000})}
+getGPS();setInterval(getGPS,15000);
+function popup(text){$('popup').innerHTML='<div class="assignment-pop">'+esc(text)+'</div>';clearTimeout(window.popTimer);window.popTimer=setTimeout(()=>{$('popup').innerHTML=''},6000)}
+function mapCard(s){const from=responderPos||{lat:s.route?.responderLat,lng:s.route?.responderLng};const origin=(Number.isFinite(+from.lat)&&Number.isFinite(+from.lng))?`${from.lat},${from.lng}`:'Current location';const dest=`${s.lat},${s.lng}`;const nav=`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(dest)}&travelmode=driving`;const osm=`https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=${encodeURIComponent((from.lat||s.lat)+','+(from.lng||s.lng)+';'+s.lat+','+s.lng)}`;return `<div class="route-box"><div class="route-title">🧭 Navigation</div><div class="route-path"><div class="route-point"><i class="dot start"></i><span>Responder location<br><small>${responderPos?`${responderPos.lat.toFixed(5)}, ${responderPos.lng.toFixed(5)}`:'GPS location will be used'}</small></span></div><div class="route-line"></div><div class="route-point"><i class="dot end"></i><span>Incident location<br><small>${dest}</small></span></div></div><div class="route-actions"><a class="primary mapbtn" href="${nav}" target="_blank" rel="noopener">Open Maps & Navigate</a><a class="ghost mapbtn" href="${osm}" target="_blank" rel="noopener">OpenStreetMap</a></div><small class="muted">Navigation may require locally downloaded/offline map data if internet is unavailable.</small></div>`}
+$('f').onsubmit=async e=>{e.preventDefault();$('msg').textContent='Logging in...';try{let d=await api('/api/responder/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({login:$('k').value.trim(),password:$('p').value})});id=d.responderId;if(d.token)sessionStorage.setItem('rescuez_responder_token',d.token);$('loginCard').classList.add('hidden');$('portal').classList.remove('hidden');load()}catch(e){$('msg').innerHTML='<div class="notice warning">'+esc(e.message)+'</div>'}};
+async function load(){if(!id)return;try{let d=await api('/api/responders/'+id+'/portal');$('who').textContent=d.responder.name+' — Responder Portal';$('inc').innerHTML=d.incidents.map(s=>`<section class='panel incident-card'><div class='incident-head'><span>🚨 ACTIVE ASSIGNMENT</span><b>${esc(s.priority||s.category)}</b></div><h2>${esc(s.category)}</h2><div class='detail-grid'><div><small>INCIDENT ID</small><b>${esc(s.id)}</b></div><div><small>STATUS</small><b>${esc(s.status)}</b></div><div><small>LOCATION</small><b>${s.lat}, ${s.lng}</b></div><div><small>PEOPLE</small><b>${s.people||1}</b></div></div><p><b>Needs:</b> ${esc(s.needs||'Not specified')}</p><p>${esc(s.description||'')}</p>${mapCard(s)}<div class="resolve-actions"><button class="resolve-btn" onclick="resolveIncident('${s.id}')">✓ Mark Rescue as Resolved</button></div></section>`).join('')||'<section class="panel empty">No assignment yet. New assignments will appear automatically.</section>';d.incidents.forEach(s=>{if(!seen.has(s.id)){seen.add(s.id);if(!localStorage.getItem('rz_seen_'+s.id)){localStorage.setItem('rz_seen_'+s.id,'1');popup('🚨 Emergency response assigned: '+s.category);if(navigator.vibrate)navigator.vibrate([250,100,250])}}})}catch(e){console.warn(e.message)}setTimeout(load,2500)}
+$('send').onclick=async()=>{if(!id)return;try{await api('/api/responders/'+id+'/resource-request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:$('rm').value})});$('rm').value='';popup('✓ Resource update sent to Admin')}catch(e){alert(e.message)}};
+async function resolveIncident(sosId){
+ if(!id)return;
+ if(!confirm('Confirm that the rescue/response for this incident is completed?'))return;
+ try{
+   await api('/api/sos/'+encodeURIComponent(sosId)+'/resolve',{
+     method:'POST',
+     headers:{'Content-Type':'application/json'},
+     body:JSON.stringify({responderId:id})
+   });
+   // Remove this SOS from the responder screen immediately.
+   localStorage.removeItem('rz_seen_'+sosId);
+   const card=[...document.querySelectorAll('.incident-card')].find(el=>el.querySelector('b')?.textContent===sosId);
+   if(card) card.remove();
+   if(!$('inc').querySelector('.incident-card')) $('inc').innerHTML='<section class="panel empty">No active assignment. You are available for the next emergency.</section>';
+   popup('✓ Rescue completed. Incident closed and Admin updated.');
+   load();
+ }catch(e){alert(e.message)}
+}
+
+document.addEventListener('click',e=>{if(e.target?.id==='askSend'){const m=$('askAdmin').value.trim();if(!m)return;api('/api/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({from:'Responder',responderId:id,message:m})}).then(()=>{$('askAdmin').value='';popup('✓ Message sent to Admin')}).catch(x=>alert(x.message))}});

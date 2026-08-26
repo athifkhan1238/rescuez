@@ -1,0 +1,11 @@
+{
+  "name": "rescuez",
+  "version": "2.1.0",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "health": "node -e \"fetch('http://127.0.0.1:3000/api/health').then(r=>r.text()).then(console.log)\""
+  },
+  "description": "RescuEZ local disaster response coordination deployment package"
+}

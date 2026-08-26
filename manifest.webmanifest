@@ -1,0 +1,9 @@
+{
+  "name": "RescuEZ",
+  "short_name": "RescuEZ",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07111c",
+  "theme_color": "#07111c",
+  "description": "Local disaster SOS coordination portal"
+}
