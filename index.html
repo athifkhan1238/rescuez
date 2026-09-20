@@ -1,1 +1,17 @@
-<!doctype html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RescuEZ — Emergency Response Network</title><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><link rel="stylesheet" href="style.css"><link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#07111c"></head><body><div class="gate"><div class="gate-card"><div class="logo">Rescu<span>EZ</span></div><div class="eyebrow">DISASTER RELIEF • RESOURCE ROUTING</div><h1>One SOS.<br><span>The right help.</span><br>The fastest route.</h1><p>Choose your secure portal.</p><div class="portal-grid"><a class="portal user" href="user.html"><span>🚨</span><b>Victim Portal</b><small>Report an emergency, share your location and track your request.</small></a><a class="portal admin" href="admin.html"><span>⌘</span><b>Command Center</b><small>Monitor SOS requests, dispatch responders and coordinate relief.</small></a></div><div class="demo-badge">SECURE DISASTER RESPONSE NETWORK</div></div></div><script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/sw.js").catch(()=>{})}</script></body></html>
+<!doctype html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RescuEZ — Emergency Response Network</title><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><link rel="stylesheet" href="style.css?v=7"><link rel="manifest" href="/manifest-user.webmanifest"><meta name="theme-color" content="#07111c"><link rel="icon" type="image/png" href="/icons/user-192.png"><link rel="apple-touch-icon" href="/icons/user-192.png"></head><body><div class="gate"><div class="gate-card"><div class="logo">Rescu<span>EZ</span></div><div class="eyebrow">DISASTER RELIEF • RESOURCE ROUTING</div><h1>One SOS.<br><span>The right help.</span><br>The fastest route.</h1><p>Choose your secure portal.</p><div class="portal-grid"><a class="portal user" href="user.html"><span>🚨</span><b>Victim Portal</b><small>Report an emergency, share your location and track your request.</small></a><a class="portal admin" href="admin.html"><span>⌘</span><b>Command Center</b><small>Monitor SOS requests, dispatch responders and coordinate relief.</small></a></div><div class="demo-badge">SECURE DISASTER RESPONSE NETWORK</div></div></div><script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/sw.js").catch(()=>{})}</script><div id="rzPermissionGate" class="permission-gate" style="position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;z-index:2147483647!important;display:flex!important;align-items:center!important;justify-content:center!important;background:rgba(3,9,16,.96)!important;pointer-events:auto!important;touch-action:auto!important;">
+<div class="permission-card">
+<div class="alert-pulse">🚨</div>
+<div class="eyebrow">RESCUEZ SAFETY SETUP</div>
+<h2>Enable emergency permissions</h2>
+<p>Allow location, motion/shake detection, notifications and sound so SOS and emergency alerts can work immediately.</p>
+<div class="permission-list">
+<div>📍 <b>Location</b><span>For current-location SOS</span></div>
+<div>📳 <b>Motion</b><span>For Shake SOS</span></div>
+<div>🔔 <b>Notifications</b><span>For assignment/emergency alerts</span></div>
+<div>🔊 <b>Sound</b><span>For the emergency buzzer</span></div>
+</div>
+<button id="rzEnablePermissions" class="primary" type="button">Enable &amp; Continue</button>
+<small>Browser permission dialogs may appear after tapping the button.</small>
+</div>
+</div>
+<script src="/permissions.js?v=7"></script></body></html>
