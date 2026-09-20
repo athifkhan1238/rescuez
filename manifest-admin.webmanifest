@@ -1,0 +1,11 @@
+{
+  "name":"RescuEZ Admin",
+  "short_name":"RescuEZ Admin",
+  "start_url":"/athif-private-admin-portal",
+  "scope":"/athif-private-admin-portal",
+  "display":"standalone",
+  "background_color":"#07111c",
+  "theme_color":"#07111c",
+  "description":"RescuEZ private command center app",
+  "icons":[{"src":"/icons/admin-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},{"src":"/icons/admin-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]
+}
