@@ -1,5 +1,5 @@
-const CACHE='rescuez-v1';
-const CORE=['/','/index.html','/user.html','/admin.html','/responder.html','/style.css','/app.js','/user.js','/admin.js','/responder.js','/manifest.webmanifest'];
+const CACHE='rescuez-v7';
+const CORE=['/','/index.html','/user.html','/admin.html','/responder.html','/style.css','/app.js','/user.js','/admin.js','/responder.js','/permissions.js','/manifest-user.webmanifest','/manifest-responder.webmanifest','/manifest-admin.webmanifest','/icons/user-192.png','/icons/user-512.png','/icons/responder-192.png','/icons/responder-512.png','/icons/admin-192.png','/icons/admin-512.png'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())));
-self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));
+self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;if(new URL(e.request.url).origin!==location.origin)return;e.respondWith(caches.match(e.request).then(hit=>hit||fetch(e.request).then(res=>{const copy=res.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));return res}).catch(()=>caches.match('/index.html'))))});
